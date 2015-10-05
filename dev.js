@@ -1,6 +1,7 @@
 require('shelljs/global');
 var fs = require('fs');
 var path = require('path');
+var isWin = ('win32' === require('os').platform());
 var dirs = require('./dirs');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
@@ -54,7 +55,12 @@ function compileClient() {
 
   clientDevServer.listen(clientConfig.devServer.port, clientConfig.devServer.host, function() {});
 
-  ln('-sf', loadClientBundleHtml, loadClientBundleLink);
+  if (isWin) {
+    cp('-f', loadClientBundleHtml, loadClientBundleLink); // symlink-ing in windows is a pain!
+  }
+  else {
+    ln('-sf', loadClientBundleHtml, loadClientBundleLink);
+  }
 }
 
 function runMeteor() {
