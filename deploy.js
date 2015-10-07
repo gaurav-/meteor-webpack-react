@@ -17,7 +17,7 @@ echo();
 echo('Building Webpack bundles for deployment...');
 echo();
 require('./predeploy')(function(err) {
-  if (err) return;
+  if (err) exit(1);
   deploy();
 });
 
@@ -27,6 +27,7 @@ function deploy() {
   case 'meteor.com':
     cd(dirs.meteor);
     exec('meteor deploy ' + projectName + '.meteor.com', {async: true});
+    break;
 
   case 'modulus':
     env.METEOR_SETTINGS = cat('settings/prod.json');
@@ -41,6 +42,7 @@ function deploy() {
      * then mup init inside settings/prod/ so that mup uses the new settings.json
      * this will require a settings path change in ./dev script
      */
+    cd('settings/prod');
     exec('mup deploy', {async: true});
     break;
 

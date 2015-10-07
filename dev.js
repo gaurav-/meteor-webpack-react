@@ -1,7 +1,6 @@
 require('shelljs/global');
 var fs = require('fs');
 var path = require('path');
-var isWin = ('win32' === require('os').platform());
 var dirs = require('./dirs');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
@@ -17,7 +16,17 @@ if (!clientConfig.devServer.stats) clientConfig.devServer.stats = statsOptions;
 addProgressPlugin(serverConfig);
 addProgressPlugin(clientConfig);
 
+serverConfig.plugins.push(new webpack.BannerPlugin(
+  'require("source-map-support/register");\n' +
+  'var Npm = Meteor.__mwrContext__.Npm;\n' +
+  'var Assets = Meteor.__mwrContext__.Assets;\n' +
+  'delete Meteor.__mwrContext__;\n' +
+  'var require = Npm.require;\n',
+  {raw: true}
+));
+
 var serverBundlePath = path.join(dirs.assets, 'server.bundle.js');
+var serverBundleRequirePath = serverBundlePath.replace(/\\/g, '\\\\');
 var serverBundleLink = path.join(dirs.meteor, 'server/server.bundle.min.js');
 var clientBundleLink = path.join(dirs.meteor, 'client/client.bundle.min.js');
 var loadClientBundleHtml = path.join(dirs.webpack, 'loadClientBundle.html');
@@ -51,7 +60,7 @@ function compileClient() {
 
   clientDevServer.listen(clientConfig.devServer.port, clientConfig.devServer.host, function() {});
 
-  linkify('-sf', loadClientBundleHtml, loadClientBundleLink);
+  ln('-sf', loadClientBundleHtml, loadClientBundleLink);
 }
 
 function runMeteor() {
@@ -60,12 +69,9 @@ function runMeteor() {
 }
 
 function updateRequireServerBundleJs(stats) {
-  console.log(stats.toString(statsOptions));
-  var requirePath = serverBundlePath;
-  if (isWin) {
-    requirePath = requirePath.replace(/\\/g, '\\\\');
-  }
+  console.log(stats.toString(statsOptions)) ;
   var jsonStats = stats.toJson({hash: true});
   ('//' + jsonStats.hash + '\n' +
-  'Npm.require("' + requirePath + '");').to(requireServerBundleJs);
+  'Meteor.__mwrContext__ = {Npm: Npm, Assets: Assets};\n' +
+  'Npm.require("' + serverBundleRequirePath + '");').to(requireServerBundleJs);
 }
