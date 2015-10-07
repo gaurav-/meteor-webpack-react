@@ -6,6 +6,7 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var addProgressPlugin = require('./addProgressPlugin');
 var statsOptions = require('./statsOptions');
+var ln_crossPlatform = require('./utils/ln_crossPlatform')
 
 var serverConfig = require(path.join(dirs.webpack, 'webpack.config.server.dev'));
 var clientConfig = require(path.join(dirs.webpack, 'webpack.config.client.dev'));
@@ -60,7 +61,7 @@ function compileClient() {
 
   clientDevServer.listen(clientConfig.devServer.port, clientConfig.devServer.host, function() {});
 
-  ln('-sf', loadClientBundleHtml, loadClientBundleLink);
+  ln_crossPlatform('-sf', loadClientBundleHtml, loadClientBundleLink);
 }
 
 function runMeteor() {

@@ -2,6 +2,7 @@ require('shelljs/global');
 var dirs = require('./dirs');
 var fs = require('fs');
 var path = require('path');
+var ln_crossPlatform = require('./utils/ln_crossPlatform');
 
 dirs.lib = path.join(dirs.webpack, 'lib');
 if (!fs.existsSync(dirs.lib)) mkdir(dirs.lib);
@@ -20,7 +21,7 @@ if (!fs.existsSync(path.join(dirs.lib, targetFile))) {
   mv('core-js-no-number.js', path.join(dirs.lib, targetFile));
   rm('-rf', 'node_modules');
   cd(dirs.lib);
-  ln('-sf', targetFile, 'core-js-no-number.js');
+  ln_crossPlatform('-sf', targetFile, 'core-js-no-number.js');
 }
 else {
   echo('core-js@' + coreJsVersion + ' without ES6 number constructor is up to date');

@@ -6,6 +6,7 @@ var dirs = require('./dirs');
 var webpack = require('webpack');
 var addProgressPlugin = require('./addProgressPlugin');
 var statsOptions = require('./statsOptions');
+var ln_crossPlatform = require('./utils/ln_crossPlatform');
 
 var serverConfig = require(path.join(dirs.webpack, 'webpack.config.server.prod'));
 var clientConfig = require(path.join(dirs.webpack, 'webpack.config.client.prod'));
@@ -44,7 +45,7 @@ module.exports = function(callback) {
     if (stats.toJson().errors.length) {
       return callback(new Error('Webpack reported compilation errors'));
     }
-    ln('-sf', serverBundlePath, serverBundleLink);
+    ln_crossPlatform('-sf', serverBundlePath, serverBundleLink);
     compileClient();
   });
 
@@ -59,7 +60,7 @@ module.exports = function(callback) {
       if (stats.toJson().errors.length) {
         return callback(new Error('Webpack reported compilation errors'));
       }
-      ln('-sf', clientBundlePath, clientBundleLink);
+      ln_crossPlatform('-sf', clientBundlePath, clientBundleLink);
       return callback();
     });
   }

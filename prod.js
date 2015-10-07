@@ -9,6 +9,7 @@ var dirs = require('./dirs');
 var webpack = require('webpack');
 var addProgressPlugin = require('./addProgressPlugin');
 var statsOptions = require('./statsOptions');
+var ln_crossPlatform = require('./utils/ln_crossPlatform');
 
 var serverConfig = require(path.join(dirs.webpack, 'webpack.config.server.prod'));
 var clientConfig = require(path.join(dirs.webpack, 'webpack.config.client.prod'));
@@ -39,7 +40,7 @@ serverCompiler.watch(serverConfig.watchOptions || {}, function(err, stats) {
   console.log(stats.toString(statsOptions));
   if (!serverBundleReady) {
     serverBundleReady = true;
-    ln('-sf', serverBundlePath, serverBundleLink);
+    ln_crossPlatform('-sf', serverBundlePath, serverBundleLink);
     compileClient();
   }  
 });
@@ -50,7 +51,7 @@ function compileClient() {
     console.log(stats.toString(statsOptions));
     if (!clientBundleReady) {
       clientBundleReady = true;
-      ln('-sf', clientBundlePath, clientBundleLink);
+      ln_crossPlatform('-sf', clientBundlePath, clientBundleLink);
       runMeteor();
     }  
   });
